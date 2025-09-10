@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Mikroplastik Indonesia | SIC Satria Data 2025</title>
+    <title>SIMikro | Dashboard Interaktif Mikroplastik Indonesia</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN for data visualization -->
@@ -13,13 +13,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles for the dashboard */
         body {
             font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        /* Style for the active navigation link */
         .nav-link.active {
             background-color: #d1fae5; /* emerald-100 */
             color: #059669; /* emerald-600 */
@@ -28,207 +26,179 @@
         .nav-link.active svg {
             stroke: #059669; /* emerald-600 */
         }
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f8fafc; /* slate-50 */
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #d1d5db; /* gray-300 */
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #9ca3af; /* gray-400 */
-        }
-        /* Style for the modal */
-        #mapModal.hidden {
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+        
+        /* Interactive Anatomy Tooltip */
+        #anatomy-tooltip {
+            position: absolute;
             display: none;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            pointer-events: none; /* Allows mouse events to pass through */
+            white-space: pre-wrap;
+            max-width: 250px;
+            z-index: 10;
         }
-        /* Custom styles for Gemini API features */
-        .gemini-recommendation-card {
-            border-left: 4px solid #10b981; /* emerald-500 */
-            transition: all 0.3s ease-in-out;
+        .organ-path:hover {
+            fill: rgba(239, 68, 68, 0.3); /* red-500 with opacity */
+            cursor: pointer;
+            transition: fill 0.2s;
         }
-        /* Loading spinner */
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 4px solid #10b981;
-            width: 32px;
-            height: 32px;
-            -webkit-animation: spin 2s linear infinite; /* Safari */
-            animation: spin 2s linear infinite;
+
+        .quiz-option {
+            transition: background-color 0.2s;
         }
-        @-webkit-keyframes spin {
-          0% { -webkit-transform: rotate(0deg); }
-          100% { -webkit-transform: rotate(360deg); }
+        .quiz-option.correct {
+            background-color: #d1fae5; /* emerald-100 */
+            border-color: #10b981; /* emerald-500 */
         }
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+        .quiz-option.wrong {
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
         }
     </style>
 </head>
-<body class="bg-emerald-50 text-slate-800">
+<body class="bg-slate-50 text-slate-800">
     <div class="flex h-screen">
         <!-- Sidebar Navigation -->
         <aside class="w-64 bg-white shadow-xl flex flex-col">
             <div class="p-6 border-b border-slate-200">
-                <h1 class="text-xl font-bold text-teal-600">PLASTIKPEDIA</h1>
-                <p class="text-xs text-slate-500 mt-1">Jelajahi Data, Pahami Bahaya, Ciptakan Solusi.</p>
+                <h1 class="text-xl font-bold text-teal-700">SIMikro</h1>
+                <p class="text-xs text-slate-500 mt-1">Data Mikro, Dampak Makro.</p>
             </div>
             <nav class="flex-1 px-4 py-6 space-y-2">
-                <a href="#" onclick="showPage('dashboard')" class="nav-link active flex items-center px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard mr-3"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-                    Dashboard Utama
+                <a href="#" onclick="showPage('tentang-simikro')" class="nav-link active flex items-center px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info mr-3"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    Tentang SIMikro
                 </a>
                 <a href="#" onclick="showPage('peta')" class="nav-link flex items-center px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map mr-3"><path d="M14.106 5.553a2 2 0 0 0-1.218-1.218l-5.644-1.612a1 1 0 0 0-1.265.803l-1.612 5.644a2 2 0 0 0 1.218 2.474l5.644 1.612a1 1 0 0 0 1.265-.803l1.612-5.644a2 2 0 0 0-1.218-2.474z"/><path d="m22 22-5.644-1.612a1 1 0 0 0-.803-1.265l-5.644-1.612a2 2 0 0 0-2.474 1.218l-1.612 5.644a1 1 0 0 0 .803 1.265l5.644 1.612a2 2 0 0 0 2.474-1.218Z"/><path d="m15.823 15.823 5.644 1.612a1 1 0 0 0 1.265-.803l1.612-5.644a2 2 0 0 0-1.218-2.474l-5.644-1.612a1 1 0 0 0-1.265.803l-1.612 5.644a2 2 0 0 0 1.218 2.474Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map mr-3"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
                     Peta Persebaran
                 </a>
-                 <a href="#" onclick="showPage('analisis')" class="nav-link flex items-center px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                 <a href="#" onclick="showPage('forecasting')" class="nav-link flex items-center px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-3 mr-3"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-                    Analisis & Riset
+                    Forecasting & Riset
                 </a>
                 <a href="#" onclick="showPage('kesehatan')" class="nav-link flex items-center px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart-pulse mr-3"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.7-1.5L11.5 14l1.8-3h5"/></svg>
                     Dampak Kesehatan
                 </a>
                  <a href="#" onclick="showPage('solusi')" class="nav-link flex items-center px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles mr-3"><path d="m12 3-1.9 5.8-5.8 1.9 5.8 1.9L12 18l1.9-5.8 5.8-1.9-5.8-1.9L12 3z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb mr-3"><path d="M15 14c.2-1 .7-1.7 1.5-2.5C17.7 10.2 18 9.2 18 8a6 6 0 0 0-12 0c0 1.2.3 2.2 1.5 3.5.7.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
                     Solusi & Aksi
+                </a>
+                <a href="#" onclick="showPage('game')" class="nav-link flex items-center px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad-2 mr-3"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="2"/></svg>
+                    Game Edukasi
                 </a>
                 <a href="#" onclick="showPage('berita')" class="nav-link flex items-center px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-newspaper mr-3"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16a2 2 0 0 0-2-2Z"/><path d="M8 6h8"/><path d="M8 10h8"/><path d="M8 14h4"/></svg>
                     Berita & Artikel
                 </a>
+                 <a href="#" onclick="showPage('glosarium')" class="nav-link flex items-center px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open mr-3"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    Glosarium
+                </a>
             </nav>
-            <div class="p-4 border-t border-slate-200 mt-auto">
-                <a href="#" onclick="showPage('tentang')" class="text-xs text-slate-500 hover:text-teal-600">Tentang Proyek SIC 2025</a>
-            </div>
         </aside>
 
         <!-- Main Content -->
         <main class="flex-1 p-8 overflow-y-auto">
-            <!-- Page: Dashboard Utama -->
-            <div id="dashboard" class="content-page">
-                <h2 class="text-3xl font-bold text-slate-800 mb-2">Dashboard Mikroplastik Indonesia</h2>
-                <p class="text-slate-500 mb-8">Gambaran Umum Kondisi Mikroplastik Nasional</p>
-
-                <!-- Key Metrics -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 transform hover:-translate-y-1 transition-transform duration-300">
-                        <h3 class="text-sm font-semibold text-slate-500">Tingkat Kontaminasi (Air Tawar)</h3>
-                        <p class="text-3xl font-extrabold mt-2 text-teal-600">12,5 <span class="text-lg font-medium text-slate-500">partikel/L</span></p>
-                        <p class="text-xs text-emerald-600 mt-1 font-semibold">+2,1% dari tahun lalu</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 transform hover:-translate-y-1 transition-transform duration-300">
-                        <h3 class="text-sm font-semibold text-slate-500">Sumber Polusi Utama</h3>
-                        <p class="text-3xl font-extrabold mt-2 text-teal-600">Limbah Domestik</p>
-                        <p class="text-xs text-slate-500 mt-1">Menyumbang >40% total polusi</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 transform hover:-translate-y-1 transition-transform duration-300">
-                        <h3 class="text-sm font-semibold text-slate-500">Jenis Polimer Terbanyak</h3>
-                        <p class="text-3xl font-extrabold mt-2 text-teal-600">Polyethylene (PE)</p>
-                        <p class="text-xs text-slate-500 mt-1">Umumnya dari kantong plastik</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 transform hover:-translate-y-1 transition-transform duration-300">
-                        <h3 class="text-sm font-semibold text-slate-500">Provinsi Paling Terdampak</h3>
-                        <p class="text-3xl font-extrabold mt-2 text-teal-600">Jawa Barat</p>
-                        <p class="text-xs text-slate-500 mt-1">Berdasarkan data klasterisasi</p>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                        <h3 class="text-lg font-semibold mb-4">Konsentrasi Mikroplastik per Jenis Polimer</h3>
-                        <canvas id="polymerChart"></canvas>
-                    </div>
-                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                        <h3 class="text-lg font-semibold mb-4">Tahukah Anda? (Nice Info)</h3>
-                        <ul class="space-y-4 text-sm text-slate-600">
-                            <li class="flex items-start">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb text-amber-500 mr-3 flex-shrink-0 mt-0.5"><path d="M15 14c.2-1 .7-1.7 1.5-2.5C17.7 10.2 18 9.2 18 8a6 6 0 0 0-12 0c0 1.2.3 2.2 1.5 3.5.7.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-                                Rata-rata orang Indonesia dapat mengonsumsi mikroplastik setara dengan satu kartu kredit setiap minggunya melalui air dan makanan.
-                            </li>
-                            <li class="flex items-start">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-droplets text-sky-500 mr-3 flex-shrink-0 mt-0.5"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.7-3.02C8.23 8.5 8 7.33 8 6.2c0-1.1.9-2.02 2-2.02s2 .92 2 2.02c0 1.13-.23 2.3-1.3 3.07-.8.5-1.7 1.3-1.7 2.23 0 1.24 1.02 2.25 2.25 2.25s2.25-1.01 2.25-2.25c0-.93-.9-1.73-1.7-2.23-1.1-1-1.3-2.14-1.3-3.07 0-1.1.9-2.02 2-2.02s2 .92 2 2.02c0 1.13-.23 2.3-1.3 3.07a4.01 4.01 0 0 0-3.44 6.13c.2.5.72.8 1.24.8h.02c.62 0 1.17-.42 1.35-1.02.2-.62.05-1.28-.4-1.76-.6-.6-1.57-.8-2.35-.4-1.2.6-2.1 1.9-2.1 3.4 0 2.2 1.8 4 4 4s4-1.8 4-4c0-.26-.02-.5-.05-.75"/></svg>
-                                Sungai Citarum, salah satu sungai terkotor di dunia, memiliki konsentrasi mikroplastik yang sangat tinggi, berdampak pada ekosistem dan kesehatan jutaan orang.
-                            </li>
-                        </ul>
+            <!-- Page: Tentang SIMikro -->
+            <div id="tentang-simikro" class="content-page">
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-8 text-center">SIMikro (Sistem Informasi Mikroplastik)</h2>
+                    <div class="grid md:grid-cols-5 gap-8 items-start">
+                        <div class="md:col-span-3 text-sm text-slate-600 leading-relaxed">
+                            <p class="mb-4"><strong>Judul Infografis:</strong> Mikroplastik Musuh Tidak Kasat Mata Bagi Generasi Sehat</p>
+                            <p><strong>Tema:</strong> Integrasi Gaya Hidup dan Teknologi untuk Menuju Masyarakat Sehat.</p>
+                            <p><strong>Sub-Tema:</strong> Kesehatan Masyarakat</p>
+                            <p><strong>ID:</strong> SD2025030000247</p>
+                            <br>
+                            <p>SIMikro adalah dashboard interaktif di Indonesia yang menyediakan informasi terkait mikroplastik. Dashboard ini bertujuan meningkatkan kesadaran publik mengenai urgensi bahaya mikroplastik melalui visualisasi data yang komprehensif dan mudah dipahami, menyajikan hasil analisis statistik, peta persebaran, riset terbaru, serta dampak kesehatan, yang semuanya berfokus pada data relevan di Indonesia.</p>
+                        </div>
+                        <div class="md:col-span-2 space-y-4">
+                             <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                 <h3 class="font-bold text-center text-slate-700 mb-4">Tim Penyusun</h3>
+                                 <div class="text-center space-y-2">
+                                     <p class="font-semibold">Agatha Kristania Prineysa</p>
+                                     <p class="font-semibold">Yudit Ginsa Kurnia Putri</p>
+                                     <p class="font-semibold">Rizqi Adika Permana</p>
+                                     <hr class="w-2/3 my-2 border-slate-300 mx-auto">
+                                     <p class="text-sm font-semibold text-teal-700">Universitas Diponegoro</p>
+                                 </div>
+                             </div>
+                             <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+                                 <!-- TUTORIAL: Ganti src di bawah dengan nama file logo Anda setelah diunggah ke GitHub -->
+                                 <img src="logo_satriadata.png" alt="Logo Satria Data 2025" class="h-16 mx-auto mb-2" onerror="this.alt='Logo Satria Data 2025'">
+                                 <!-- TUTORIAL: Ganti src di bawah dengan nama file infografis Anda -->
+                                 <img src="infografis_final.png" alt="Preview Infografis" class="w-full rounded-md border-2 border-slate-300" onerror="this.alt='Preview Infografis Anda'">
+                             </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Page: Peta Persebaran -->
             <div id="peta" class="content-page hidden">
-                <h2 class="text-3xl font-bold text-slate-800 mb-2">Peta Klasterisasi Persebaran Mikroplastik</h2>
-                <p class="text-slate-500 mb-8">Visualisasi Tingkat Risiko Kontaminasi Mikroplastik per Provinsi di Indonesia</p>
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Peta Risiko Mikroplastik di Indonesia</h2>
+                <p class="text-slate-500 mb-8">Sebaran tingkat risiko kontaminasi per provinsi.</p>
                 <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
                     <div class="flex flex-col md:flex-row gap-8">
-                        <div class="w-full md:w-2/3 cursor-pointer" onclick="openMapModal()">
-                            <p class="text-center text-sm text-slate-500 mb-2">Representasi Peta Klasterisasi Provinsi (Data Fiktif) - Klik untuk memperbesar</p>
-                             <div class="relative">
-                                <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto border rounded-lg">
-                                    <path d="M10 200 L50 150 L100 220 L150 180 L200 250 L250 210 L350 280 L400 240 L500 300 L550 250 L600 320 L700 280 L750 350 L850 300 L900 360 L950 320 L990 380" fill="#ef4444" stroke="#fff" stroke-width="2" /> <!-- Example province with high risk -->
-                                    <path d="M20 250 L70 200 L120 270 L170 230 L220 300 L270 260 L370 330 L420 290 L520 350 L570 300 L620 370 L720 330 L770 400 L870 350" fill="#f97316" stroke="#fff" stroke-width="2" /> <!-- Example province with medium risk -->
-                                    <path d="M30 300 L80 250 L130 320 L180 280 L230 350 L280 310 L380 380 L430 340 L530 400" fill="#facc15" stroke="#fff" stroke-width="2" /> <!-- Example province with low risk -->
-                                    <text x="100" y="200" font-family="Inter" font-size="14" fill="#fff">Sumatera</text>
-                                    <text x="400" y="280" font-family="Inter" font-size="14" fill="#fff">Jawa</text>
-                                    <text x="600" y="300" font-family="Inter" font-size="14" fill="#fff">Kalimantan</text>
-                                    <text x="800" y="340" font-family="Inter" font-size="14" fill="#fff">Papua</text>
-                                </svg>
-                                <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
-                                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zoom-in"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>
-                                </div>
-                            </div>
+                        <div class="w-full md:w-2/3">
+                             <img src="peta_klaster.png" alt="Peta Klaster Risiko Mikroplastik" class="w-full h-auto rounded-lg bg-slate-100" onerror="this.parentElement.innerHTML = '<div class=\'relative bg-slate-100 rounded-lg flex items-center justify-center h-full min-h-[400px]\'><p class=\'text-slate-400 text-center\'>Gagal memuat peta.<br>Pastikan file \'peta_klaster.png\' ada di folder proyek.</p></div>'">
                         </div>
                         <div class="w-full md:w-1/3">
                             <h3 class="font-semibold text-lg mb-4">Legenda & Metodologi</h3>
                             <div class="space-y-3 mb-6">
-                                <div class="flex items-center">
-                                    <div class="w-5 h-5 rounded-full bg-red-500 mr-3"></div>
-                                    <span class="text-sm">Klaster 1: Risiko Sangat Tinggi</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <div class="w-5 h-5 rounded-full bg-orange-500 mr-3"></div>
-                                    <span class="text-sm">Klaster 2: Risiko Tinggi</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <div class="w-5 h-5 rounded-full bg-amber-400 mr-3"></div>
-                                    <span class="text-sm">Klaster 3: Risiko Sedang</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <div class="w-5 h-5 rounded-full bg-yellow-300 mr-3"></div>
-                                    <span class="text-sm">Klaster 4: Risiko Rendah</span>
-                                </div>
+                                <div class="flex items-center"><div class="w-5 h-5 rounded-full bg-red-500 mr-3"></div><span class="text-sm">Klaster C: Risiko Tinggi (12 Provinsi)</span></div>
+                                <div class="flex items-center"><div class="w-5 h-5 rounded-full bg-orange-500 mr-3"></div><span class="text-sm">Klaster B: Risiko Sedang (25 Provinsi)</span></div>
+                                <div class="flex items-center"><div class="w-5 h-5 rounded-full bg-yellow-400 mr-3"></div><span class="text-sm">Klaster A: Risiko Rendah (1 Provinsi)</span></div>
                             </div>
                             <h4 class="font-semibold text-md mb-2">Metodologi Klasterisasi</h4>
-                            <p class="text-sm text-slate-600 leading-relaxed">
-                                Pengelompokan provinsi dilakukan menggunakan metode <strong>Ensemble Clustering</strong> yang menggabungkan hasil dari 5 algoritma berbeda (K-Means, Agglomerative Clustering, DBSCAN, GMM, dan Spectral Clustering) untuk mendapatkan hasil yang lebih robust dan akurat.
-                                <br><br>
-                                Data yang digunakan mencakup 6 variabel kunci: kepadatan penduduk, tingkat industrialisasi, volume sampah plastik, curah hujan, panjang garis pantai, dan jumlah sungai besar.
+                            <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                                Pengelompokan provinsi menggunakan <strong>Ensemble Clustering</strong>, sebuah teknik yang menggabungkan hasil dari beberapa model untuk keputusan yang lebih akurat. Model yang digunakan:
+                                <ul class="list-disc list-inside text-sm text-slate-600 mt-2">
+                                    <li>K-Means</li>
+                                    <li>Agglomerative Clustering</li>
+                                    <li>DBSCAN</li>
+                                    <li>GMM</li>
+                                    <li>Spectral Clustering</li>
+                                </ul>
                             </p>
+                            <h4 class="font-semibold text-md mb-2">Variabel Kunci yang Digunakan</h4>
+                             <ul class="list-disc list-inside text-sm text-slate-600 space-y-1">
+                                <li>Kepadatan penduduk</li>
+                                <li>Tingkat industrialisasi</li>
+                                <li>Volume sampah plastik</li>
+                                <li>Curah hujan</li>
+                                <li>Panjang garis pantai</li>
+                                <li>Jumlah sungai besar</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Page: Analisis & Riset -->
-            <div id="analisis" class="content-page hidden">
-                 <h2 class="text-3xl font-bold text-slate-800 mb-2">Analisis Statistik & Riset Terbaru</h2>
-                <p class="text-slate-500 mb-8">Forecasting dan Tinjauan Literatur Terkini</p>
-
+            <!-- Page: Forecasting & Riset -->
+            <div id="forecasting" class="content-page hidden">
+                 <h2 class="text-3xl font-bold text-slate-800 mb-2">Forecasting & Riset</h2>
+                <p class="text-slate-500 mb-8">Proyeksi tren dan temuan-temuan ilmiah terkini.</p>
                 <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 mb-8">
-                    <h3 class="text-lg font-semibold mb-4">Forecasting Tren Kontaminasi Mikroplastik Nasional (2025-2030)</h3>
-                    <canvas id="forecastingChart"></canvas>
+                    <h3 class="text-lg font-semibold mb-1">Forecasting Timbulan Sampah Plastik Nasional (2024-2028)</h3>
+                    <p class="text-xs text-slate-500 mb-2"><strong>Timbulan plastik</strong> adalah jumlah total sampah plastik yang dihasilkan dan dibuang dalam suatu periode tertentu.</p>
+                    <p class="text-xs text-slate-500 mb-4">Grafik prediksi dihasilkan menggunakan metode <strong>Exponential Smoothing</strong> (MAPE: 7,68%).</p>
+                    <div class="h-80"><canvas id="forecastingChart"></canvas></div>
                 </div>
-
                 <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                    <h3 class="text-lg font-semibold mb-4">Riset Terbaru Terkait Mikroplastik di Indonesia</h3>
+                    <h3 class="text-lg font-semibold mb-4">Riset Terkait Mikroplastik</h3>
                      <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left">
                             <thead class="text-xs text-slate-700 uppercase bg-slate-50">
@@ -241,22 +211,16 @@
                             </thead>
                             <tbody>
                                 <tr class="bg-white border-b hover:bg-slate-50">
-                                    <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Microplastic contamination in farmed mussels from Jakarta Bay, Indonesia</th>
-                                    <td class="px-6 py-4">Science of The Total Environment</td>
-                                    <td class="px-6 py-4">Ditemukan 1,5 partikel/gram pada kerang hijau, mayoritas jenis filamen.</td>
-                                    <td class="px-6 py-4">2021</td>
+                                    <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Microplastics in human plaques and cardiovascular events</th>
+                                    <td class="px-6 py-4">New England Journal of Medicine (NEJM)</td>
+                                    <td class="px-6 py-4">Pasien dengan mikroplastik di plak arteri memiliki risiko 4.5x lebih tinggi terkena serangan jantung/stroke.</td>
+                                    <td class="px-6 py-4">2024</td>
                                 </tr>
                                 <tr class="bg-slate-50 border-b hover:bg-slate-100">
-                                    <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Abundance and characteristics of microplastics in commercial sea salts from Indonesia</th>
-                                    <td class="px-6 py-4">Marine Pollution Bulletin</td>
-                                    <td class="px-6 py-4">Semua sampel garam komersial terkontaminasi, dengan rata-rata 27 partikel/10g.</td>
-                                    <td class="px-6 py-4">2022</td>
-                                </tr>
-                                 <tr class="bg-white border-b hover:bg-slate-50">
-                                    <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Microplastics in Indonesian tap water: a nationwide study</th>
-                                    <td class="px-6 py-4">Jurnal Kesehatan Lingkungan Indonesia</td>
-                                    <td class="px-6 py-4">80% sampel air keran dari 10 kota besar positif mengandung mikroplastik.</td>
-                                    <td class="px-6 py-4">2023</td>
+                                    <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Human Consumption of Microplastics</th>
+                                    <td class="px-6 py-4">WWF / University of Newcastle</td>
+                                    <td class="px-6 py-4">Manusia dapat mengonsumsi sekitar 5 gram mikroplastik per minggu, setara satu kartu kredit.</td>
+                                    <td class="px-6 py-4">2019</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -266,138 +230,164 @@
 
             <!-- Page: Dampak Kesehatan -->
             <div id="kesehatan" class="content-page hidden">
-                <h2 class="text-3xl font-bold text-slate-800 mb-2">Dampak Mikroplastik Terhadap Kesehatan Manusia</h2>
-                <p class="text-slate-500 mb-8">Potensi Risiko Kesehatan Berdasarkan Bukti Ilmiah</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-alert text-red-500 mb-4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-                        <h3 class="text-lg font-semibold mb-2">Stres Oksidatif & Peradangan</h3>
-                        <p class="text-sm text-slate-600">Partikel mikroplastik dapat memicu respons inflamasi dalam tubuh, menyebabkan kerusakan seluler dan jaringan akibat stres oksidatif.</p>
-                    </div>
-                     <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dna text-blue-500 mb-4"><path d="M2 15c6.667-6 13.333-6 20 0"/><path d="M20 9c-6.667 6-13.333 6-20 0"/><path d="M15 22v-4"/><path d="M9 22v-4"/><path d="M15 2v4"/><path d="M9 2v4"/></svg>
-                        <h3 class="text-lg font-semibold mb-2">Gangguan Sistem Endokrin (Hormon)</h3>
-                        <p class="text-sm text-slate-600">Bahan kimia aditif pada plastik (seperti BPA dan ftalat) dapat terlepas dan meniru hormon, mengganggu keseimbangan endokrin dalam tubuh.</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bug text-green-500 mb-4"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M4 10h16"/><path d="m8 18 1.9-1.9a1 1 0 0 1 1.4 0l.7.7"/><path d="m16 18-1.9-1.9a1 1 0 0 0-1.4 0l-.7.7"/></svg>
-                        <h3 class="text-lg font-semibold mb-2">Perubahan Mikrobioma Usus</h3>
-                        <p class="text-sm text-slate-600">Konsumsi mikroplastik dapat mengubah komposisi bakteri baik dalam usus, yang berpotensi menyebabkan masalah pencernaan dan imunitas.</p>
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Dampak Mikroplastik: Interaktif & Statis</h2>
+                <p class="text-slate-500 mb-8">Pilih mode tampilan untuk melihat potensi risiko kesehatan.</p>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+                    <div class="relative w-full max-w-sm mx-auto">
+                        <div id="anatomy-tooltip"></div>
+                        <!-- Reliable inline SVG for anatomy -->
+                        <svg viewBox="0 0 250 450" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                            <path d="M125,5 A45,25 0,0,0 80,30 L80,50 A45,25 0,0,0 125,75 A45,25 0,0,0 170,50 L170,30 A45,25 0,0,0 125,5 M100,80 L150,80 L150,100 L100,100 Z M80,110 L170,110 L190,180 L160,200 L160,280 L90,280 L90,200 L60,180 Z M95,290 L155,290 L155,350 L95,350 Z M110,360 L140,360 L140,400 L110,400 Z M100,410 L150,410 L125,440 Z" fill="#fde8e8" stroke="#6b7280" stroke-width="1"/>
+                            <path class="organ-path" data-info="Otak: Ditemukan partikel mikroplastik yang dapat melewati sawar darah-otak, berpotensi menyebabkan peradangan saraf dan stres oksidatif." fill="transparent" d="M85,5 L165,5 L165,75 L85,75 Z"/>
+                            <path class="organ-path" data-info="Paru-paru: Partikel mikroplastik yang terhirup dari udara dapat mengendap di jaringan paru-paru, memicu iritasi dan peradangan." fill="transparent" d="M70,110 L180,110 L180,200 L70,200 Z"/>
+                            <path class="organ-path" data-info="Jantung: Studi terbaru mengaitkan mikroplastik dalam plak arteri dengan peningkatan risiko serangan jantung dan stroke sebesar 4.5x lipat." fill="transparent" d="M105,150 L145,150 L145,190 L105,190 Z"/>
+                            <path class="organ-path" data-info="Pencernaan: Mikroplastik yang tertelan dapat merusak lapisan usus, mengubah mikrobioma, dan menyebabkan peradangan kronis." fill="transparent" d="M90,210 L160,210 L160,280 L90,280 Z"/>
+                            <path class="organ-path" data-info="Reproduksi: Bahan kimia dari plastik dapat bertindak sebagai pengganggu hormon, berpotensi mempengaruhi kesuburan dan perkembangan." fill="transparent" d="M95,290 L155,290 L155,350 L95,350 Z"/>
+                        </svg>
+                         <p class="text-center text-xs text-slate-400 mt-2">Arahkan kursor pada organ untuk melihat info</p>
                     </div>
                 </div>
-                 <p class="text-xs text-center text-slate-500 mt-8">Sumber: Kompilasi dari berbagai jurnal ilmiah dan laporan Kemenkes. Penelitian lebih lanjut masih terus dilakukan.</p>
             </div>
 
             <!-- Page: Solusi & Aksi -->
             <div id="solusi" class="content-page hidden">
-                <h2 class="text-3xl font-bold text-slate-800 mb-2">Rekomendasi Gaya Hidup Cerdas</h2>
-                <p class="text-slate-500 mb-8">Dapatkan solusi personal untuk mengurangi jejak mikroplastik Anda, didukung oleh AI.</p>
-                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                    <h3 class="text-lg font-semibold mb-1">1. Pilih Kebiasaan Anda Sehari-hari</h3>
-                    <p class="text-sm text-slate-500 mb-4">Pilih satu atau lebih kebiasaan yang paling sering Anda lakukan.</p>
-                    <div id="habits-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-                        <!-- Habits will be populated by JS -->
+                <h2 class="text-3xl font-bold text-slate-800 mb-8">Panduan Solusi & Aksi: Dari Hulu ke Hilir</h2>
+                <div class="space-y-4">
+                    <!-- Hulu Section -->
+                    <div class="text-center">
+                        <h3 class="text-2xl font-bold text-teal-700 mb-2">Solusi Pencegahan (Di Hulu)</h3>
+                        <p class="text-slate-600 max-w-2xl mx-auto">Mencegah sampah plastik dari sumbernya adalah langkah paling efektif. Mulailah dari kebiasaan sehari-hari.</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-teal-500 text-center">
+                            <h4 class="font-bold mb-2">Gunakan Botol Minum Isi Ulang</h4>
+                            <p class="text-sm text-slate-600">Hindari ribuan partikel mikroplastik dari botol sekali pakai.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-teal-500 text-center">
+                            <h4 class="font-bold mb-2">Bawa Tas Belanja Kain</h4>
+                            <p class="text-sm text-slate-600">Gantikan ratusan kantong plastik yang berpotensi mencemari.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-teal-500 text-center">
+                            <h4 class="font-bold mb-2">Pilih Pakaian Serat Alami</h4>
+                            <p class="text-sm text-slate-600">Kurangi serat mikroplastik saat mencuci dengan memilih katun atau linen.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- River Flow Separator -->
+                    <div class="flex justify-center py-4">
+                         <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-slate-300">
+                            <path d="M3 6L3 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 6L8 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M13 6L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 12L21 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                     </div>
 
-                    <h3 class="text-lg font-semibold mb-4">2. Hasilkan Rekomendasi</h3>
-                    <button id="generate-recommendation-btn" class="flex items-center justify-center bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition-colors w-full md:w-auto disabled:bg-slate-400">
-                        ✨ Hasilkan Rekomendasi Gaya Hidup
-                    </button>
-
-                    <div id="recommendation-loader" class="hidden my-6 flex justify-center">
-                        <div class="loader"></div>
+                    <!-- Hilir Section -->
+                     <div class="text-center">
+                        <h3 class="text-2xl font-bold text-orange-600 mb-2">Aksi Penanganan (Di Hilir)</h3>
+                        <p class="text-slate-600 max-w-2xl mx-auto">Mengelola sampah yang sudah ada untuk mencegahnya terurai menjadi mikroplastik.</p>
                     </div>
-
-                    <div id="recommendation-output" class="mt-8 hidden">
-                        <h3 class="text-xl font-bold mb-4 text-slate-800">Rekomendasi Aksi untuk Anda:</h3>
-                        <div id="recommendation-content" class="gemini-recommendation-card bg-emerald-50 p-6 rounded-lg text-slate-700 prose max-w-none">
-                            <!-- Gemini output will be displayed here -->
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-orange-500 text-center">
+                            <h4 class="font-bold mb-2">Pilah Sampah dari Rumah</h4>
+                            <p class="text-sm text-slate-600">Tingkatkan laju daur ulang dan cegah kebocoran ke lingkungan.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-orange-500 text-center">
+                            <h4 class="font-bold mb-2">Dukung Gerakan Pungut Sampah</h4>
+                            <p class="text-sm text-slate-600">Kurangi jumlah plastik di alam secara langsung.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-orange-500 text-center">
+                            <h4 class="font-bold mb-2">Edukasi Lingkungan Sekitar</h4>
+                            <p class="text-sm text-slate-600">Bagikan informasi dari dashboard ini untuk kesadaran kolektif.</p>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Page: Berita & Artikel -->
-            <div id="berita" class="content-page hidden">
-                <h2 class="text-3xl font-bold text-slate-800 mb-2">Berita & Artikel</h2>
-                <p class="text-slate-500 mb-8">Informasi terkini seputar isu mikroplastik di Indonesia.</p>
-
-                 <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 mb-8">
-                    <h3 class="text-lg font-semibold mb-4">Ringkasan Berita Otomatis</h3>
-                     <p class="text-sm text-slate-500 mb-4">Klik tombol di bawah untuk mendapatkan rangkuman berita terbaru tentang "bahaya mikroplastik di Indonesia" menggunakan AI.</p>
-                    <button id="summarize-news-btn" class="flex items-center justify-center bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition-colors w-full md:w-auto disabled:bg-slate-400">
-                        ✨ Buat Ringkasan Berita Terkini
-                    </button>
-                    <div id="news-loader" class="hidden my-6 flex justify-center">
-                        <div class="loader"></div>
-                    </div>
-                    <div id="news-output" class="mt-8 hidden">
-                        <h3 class="text-xl font-bold mb-4 text-slate-800">Ringkasan Berita Terbaru:</h3>
-                        <div id="news-content" class="gemini-recommendation-card bg-emerald-50 p-6 rounded-lg text-slate-700 prose max-w-none">
-                             <!-- News summary will be displayed here -->
-                        </div>
-                        <div id="news-sources" class="mt-4 text-xs text-slate-500">
-                            <!-- News sources will be displayed here -->
-                        </div>
-                    </div>
-                </div>
-
+            <!-- Page: Game Edukasi -->
+            <div id="game" class="content-page hidden">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Game Edukasi: Kuis Cerdas SIMikro</h2>
+                <p class="text-slate-500 mb-8">Seberapa baik kamu menyimak data di dashboard ini? Uji pengetahuanmu!</p>
                 <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                    <h3 class="text-lg font-semibold mb-4">Artikel Pilihan</h3>
-                    <p>Konten berita dan artikel akan ditampilkan di sini. Halaman ini dapat diisi dengan tautan ke artikel berita eksternal atau tulisan orisinal dari tim Anda.</p>
+                    <div id="quiz-container" class="max-w-xl mx-auto text-center">
+                        <div id="quiz-start-screen">
+                            <h3 class="text-xl font-bold mb-4">Selamat Datang di Kuis Cerdas!</h3>
+                            <p class="mb-6 text-slate-600">Jawab 3 pertanyaan seputar data mikroplastik untuk menguji pemahaman Anda.</p>
+                            <button id="start-quiz-btn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Mulai Kuis</button>
+                        </div>
+                        <div id="quiz-area" class="hidden">
+                            <p class="text-lg">Skor: <span id="quiz-score" class="font-bold">0</span></p>
+                            <div id="question-container" class="my-4 p-6 bg-slate-50 rounded-lg">
+                                <p id="question-text" class="text-lg font-semibold"></p>
+                            </div>
+                            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Options will be generated here -->
+                            </div>
+                             <p id="quiz-feedback" class="mt-4 h-6 text-sm font-semibold"></p>
+                        </div>
+                         <div id="quiz-end-screen" class="hidden">
+                            <h3 class="text-xl font-bold mb-4">Kuis Selesai!</h3>
+                            <p class="mb-6 text-slate-600 text-lg">Skor Akhir Anda: <span id="final-quiz-score" class="font-bold text-teal-600 text-2xl">0</span></p>
+                            <button id="restart-quiz-btn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Ulangi Kuis</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Page: Tentang Proyek -->
-            <div id="tentang" class="content-page hidden">
-                <h2 class="text-3xl font-bold text-slate-800 mb-2">Tentang Proyek</h2>
-                <p class="text-slate-500 mb-8">Dashboard ini dikembangkan untuk kompetisi SIC Satria Data 2025.</p>
-                 <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 text-sm text-slate-600 leading-relaxed">
-                    <p><strong>Judul Infografis:</strong> [Masukkan Judul Infografis Anda di Sini]</p>
-                    <p><strong>Tema:</strong> Integrasi Gaya Hidup dan Teknologi untuk Menuju Masyarakat Sehat.</p>
-                    <p><strong>Sub-Tema:</strong> Mikroplastik dan Dampaknya bagi Kesehatan di Indonesia.</p>
-                    <br>
-                    <p>Proyek ini bertujuan untuk meningkatkan kesadaran publik mengenai urgensi bahaya mikroplastik di Indonesia melalui visualisasi data yang komprehensif dan mudah dipahami. Dashboard interaktif ini berfungsi sebagai solusi teknologi untuk menyajikan hasil analisis statistik, peta persebaran, riset terbaru, serta dampak kesehatan, yang semuanya berfokus pada data relevan di Indonesia.</p>
-                    <br>
-                    <p><strong>Tim Penyusun:</strong><br>
-                    [Nama Anggota 1]<br>
-                    [Nama Anggota 2]<br>
-                    [Nama Anggota 3]<br>
-                    Universitas [Nama Universitas Anda]</p>
+            <!-- Page: Berita & Artikel -->
+            <div id="berita" class="content-page hidden">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Berita & Artikel Pilihan</h2>
+                <p class="text-slate-500 mb-8">Kumpulan artikel dan berita relevan yang telah kami kurasi.</p>
+                 <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+                        <h3 class="text-lg font-semibold mb-2">Studi NEJM: Hubungan Mikroplastik dengan Penyakit Jantung</h3>
+                        <p class="text-sm text-slate-600 mb-3">Sebuah penelitian besar yang diterbitkan di New England Journal of Medicine menemukan bahwa individu yang memiliki partikel mikroplastik dalam plak arterinya memiliki risiko 4.5 kali lebih tinggi untuk mengalami serangan jantung, stroke, atau kematian.</p>
+                        <a href="#" class="text-sm font-semibold text-teal-600 hover:underline">Baca Selengkapnya &rarr;</a>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+                        <h3 class="text-lg font-semibold mb-2">WWF: Konsumsi Plastik Setara Kartu Kredit Tiap Minggu</h3>
+                        <p class="text-sm text-slate-600 mb-3">Laporan dari WWF memperkirakan bahwa rata-rata orang dapat menelan hingga 5 gram plastik setiap minggu, setara berat satu kartu kredit. Sumber utama paparan ini adalah melalui air minum dan makanan laut.</p>
+                        <a href="#" class="text-sm font-semibold text-teal-600 hover:underline">Baca Selengkapnya &rarr;</a>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 mt-8">
+                        <h3 class="text-lg font-semibold mb-2">Punya Saran Artikel?</h3>
+                        <p class="text-sm text-slate-600 mb-4">Kami sangat terbuka untuk menerima masukan artikel atau riset terbaru dari Anda.</p>
+                        <div class="flex gap-2">
+                            <input type="text" id="suggestion-input" placeholder="Tempelkan judul atau link artikel di sini..." class="flex-grow rounded-md border-slate-300 shadow-sm sm:text-sm">
+                            <button id="suggestion-btn" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">Kirim</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Glosarium -->
+            <div id="glosarium" class="content-page hidden">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Glosarium</h2>
+                <p class="text-slate-500 mb-8">Penjelasan istilah-istilah kunci yang digunakan dalam dashboard.</p>
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-lg border border-slate-200">
+                        <p><strong>Mikroplastik:</strong> Partikel plastik dengan ukuran kurang dari 5 milimeter yang berasal dari degradasi sampah plastik yang lebih besar atau sengaja diproduksi.</p>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg border border-slate-200">
+                        <p><strong>Ensemble Clustering:</strong> Teknik statistik yang menggabungkan beberapa hasil algoritma klasterisasi untuk menghasilkan pengelompokan data yang lebih stabil dan akurat.</p>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg border border-slate-200">
+                        <p><strong>Exponential Smoothing:</strong> Metode peramalan (forecasting) untuk data time series yang memberikan bobot lebih besar pada data yang lebih baru.</p>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg border border-slate-200">
+                        <p><strong>MAPE (Mean Absolute Percentage Error):</strong> Ukuran statistik yang digunakan untuk mengevaluasi akurasi sebuah model peramalan, dinyatakan dalam persentase.</p>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Map Modal -->
-    <div id="mapModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl p-4 w-full max-w-4xl relative">
-            <button onclick="closeMapModal()" class="absolute -top-3 -right-3 bg-white rounded-full p-1.5 shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-            </button>
-            <h3 class="text-lg font-semibold mb-4 text-center">Peta Klasterisasi Persebaran Mikroplastik</h3>
-            <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
-                <path d="M10 200 L50 150 L100 220 L150 180 L200 250 L250 210 L350 280 L400 240 L500 300 L550 250 L600 320 L700 280 L750 350 L850 300 L900 360 L950 320 L990 380" fill="#ef4444" stroke="#fff" stroke-width="2" />
-                <path d="M20 250 L70 200 L120 270 L170 230 L220 300 L270 260 L370 330 L420 290 L520 350 L570 300 L620 370 L720 330 L770 400 L870 350" fill="#f97316" stroke="#fff" stroke-width="2" />
-                <path d="M30 300 L80 250 L130 320 L180 280 L230 350 L280 310 L380 380 L430 340 L530 400" fill="#facc15" stroke="#fff" stroke-width="2" />
-                <text x="100" y="200" font-family="Inter" font-size="14" fill="#fff">Sumatera</text>
-                <text x="400" y="280" font-family="Inter" font-size="14" fill="#fff">Jawa</text>
-                <text x="600" y="300" font-family="Inter" font-size="14" fill="#fff">Kalimantan</text>
-                <text x="800" y="340" font-family="Inter" font-size="14" fill="#fff">Papua</text>
-            </svg>
-        </div>
-    </div>
-
-
     <script>
-        // --- Gemini API Configuration ---
-        const API_KEY = ""; // NOTE: Canvas will provide the key runtime
-        const GENERATE_TEXT_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
-        
         // --- Page Navigation and UI Elements ---
         const navLinks = document.querySelectorAll('.nav-link');
         const contentPages = document.querySelectorAll('.content-page');
-        const mapModal = document.getElementById('mapModal');
 
         function showPage(pageId) {
             contentPages.forEach(page => page.classList.add('hidden'));
@@ -410,206 +400,152 @@
                 }
             });
         }
-
-        function openMapModal() {
-            mapModal.classList.remove('hidden');
-        }
-
-        function closeMapModal() {
-            mapModal.classList.add('hidden');
-        }
-
-        // --- Gemini Feature 1: Lifestyle Recommendations ---
-        const habits = [
-            { id: 'kopi-kemasan', text: 'Sering membeli kopi kemasan' },
-            { id: 'botol-sekali-pakai', text: 'Menggunakan botol minum sekali pakai' },
-            { id: 'kantong-plastik', text: 'Selalu meminta kantong plastik saat belanja' },
-            { id: 'alat-makan-plastik', text: 'Sering menggunakan alat makan plastik' },
-            { id: 'produk-scrub', text: 'Menggunakan produk pembersih dengan microbeads' },
-            { id: 'teh-celup', text: 'Rutin meminum teh celup (kantong teh)'},
-            { id: 'pakaian-sintetis', text: 'Sering mencuci pakaian berbahan sintetis' },
-            { id: 'makanan-beku', text: 'Sering mengonsumsi makanan beku kemasan' },
-        ];
         
-        const habitsContainer = document.getElementById('habits-container');
-        const generateBtn = document.getElementById('generate-recommendation-btn');
-        const recommendationLoader = document.getElementById('recommendation-loader');
-        const recommendationOutput = document.getElementById('recommendation-output');
-        const recommendationContent = document.getElementById('recommendation-content');
-
-        // Populate habits checkboxes
-        habits.forEach(habit => {
-            const label = document.createElement('label');
-            label.className = 'flex items-center space-x-2 p-3 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 border border-slate-200';
-            label.innerHTML = `
-                <input type="checkbox" name="habit" value="${habit.text}" class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500">
-                <span class="text-sm text-slate-700">${habit.text}</span>
-            `;
-            habitsContainer.appendChild(label);
+        // --- Interactive Anatomy Feature ---
+        const tooltip = document.getElementById('anatomy-tooltip');
+        document.querySelectorAll('.organ-path').forEach(path => {
+            path.addEventListener('mousemove', function(e) {
+                const rect = this.getBoundingClientRect();
+                const containerRect = this.closest('svg').getBoundingClientRect();
+                tooltip.style.display = 'block';
+                tooltip.style.left = (e.clientX - containerRect.left + 15) + 'px';
+                tooltip.style.top = (e.clientY - containerRect.top + 15) + 'px';
+                tooltip.innerHTML = this.dataset.info;
+            });
+            path.addEventListener('mouseleave', function() {
+                tooltip.style.display = 'none';
+            });
+        });
+        
+        // --- Suggestion Box Simulation ---
+        const suggestionBtn = document.getElementById('suggestion-btn');
+        const suggestionInput = document.getElementById('suggestion-input');
+        suggestionBtn.addEventListener('click', () => {
+            if (suggestionInput.value.trim() !== "") {
+                alert('Terima kasih atas saran Anda! Tim kami akan meninjaunya.');
+                suggestionInput.value = "";
+            } else {
+                alert('Silakan masukkan saran Anda terlebih dahulu.');
+            }
         });
 
-        // Generate recommendations
-        generateBtn.addEventListener('click', async () => {
-            const selectedHabits = Array.from(document.querySelectorAll('input[name="habit"]:checked'))
-                .map(cb => cb.value);
+        // --- Game "Kuis Cerdas SIMikro" ---
+        const quizData = [
+            {
+                question: "Menurut studi NEJM (2024), berapa peningkatan risiko serangan jantung pada orang dengan mikroplastik di arterinya?",
+                options: ["2x lipat", "4.5x lipat", "Tidak ada peningkatan", "1.5x lipat"],
+                answer: "4.5x lipat"
+            },
+            {
+                question: "Berapa perkiraan timbulan sampah plastik di Indonesia pada tahun 2028 menurut prediksi dashboard ini?",
+                options: ["Di bawah 5 juta ton", "Sekitar 8 juta ton", "Lebih dari 10 juta ton", "Tepat 9.5 juta ton"],
+                answer: "Lebih dari 10 juta ton"
+            },
+            {
+                question: "Manakah yang BUKAN merupakan solusi pencegahan di hulu?",
+                options: ["Memilah sampah", "Membawa tas belanja", "Menggunakan botol isi ulang", "Memilih pakaian serat alami"],
+                answer: "Memilah sampah"
+            }
+        ];
 
-            if (selectedHabits.length === 0) {
-                alert('Silakan pilih minimal satu kebiasaan.');
-                return;
+        const startQuizBtn = document.getElementById('start-quiz-btn');
+        const restartQuizBtn = document.getElementById('restart-quiz-btn');
+        const quizStartScreen = document.getElementById('quiz-start-screen');
+        const quizArea = document.getElementById('quiz-area');
+        const quizEndScreen = document.getElementById('quiz-end-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const quizFeedback = document.getElementById('quiz-feedback');
+        const quizScoreEl = document.getElementById('quiz-score');
+        const finalQuizScoreEl = document.getElementById('final-quiz-score');
+
+        let currentQuestionIndex, quizScore;
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            quizScore = 0;
+            quizScoreEl.textContent = quizScore;
+            quizStartScreen.classList.add('hidden');
+            quizEndScreen.classList.add('hidden');
+            quizArea.classList.remove('hidden');
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const question = quizData[currentQuestionIndex];
+            questionText.textContent = question.question;
+            optionsContainer.innerHTML = '';
+            question.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'quiz-option p-3 bg-slate-100 rounded-lg border border-slate-300 hover:bg-slate-200';
+                button.onclick = () => selectAnswer(option, question.answer, button);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function selectAnswer(selected, correct, btn) {
+            document.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
+            if (selected === correct) {
+                quizScore++;
+                quizScoreEl.textContent = quizScore;
+                btn.classList.add('correct');
+                quizFeedback.textContent = "Benar!";
+                quizFeedback.className = "mt-4 h-6 text-sm font-semibold text-green-600";
+            } else {
+                btn.classList.add('wrong');
+                quizFeedback.textContent = `Jawaban yang benar: ${correct}`;
+                quizFeedback.className = "mt-4 h-6 text-sm font-semibold text-red-600";
             }
 
-            generateBtn.disabled = true;
-            recommendationLoader.classList.remove('hidden');
-            recommendationOutput.classList.add('hidden');
-
-            const systemPrompt = `Anda adalah seorang ahli lingkungan yang memberikan saran praktis dan mudah diikuti. Berikan rekomendasi dalam format poin-poin (markdown) untuk membantu seseorang mengurangi jejak mikroplastik berdasarkan kebiasaan mereka. Gunakan bahasa yang positif dan memotivasi.`;
-            const userQuery = `Berdasarkan kebiasaan saya berikut: ${selectedHabits.join(', ')}, berikan saya beberapa langkah aksi konkret untuk mengurangi kontribusi saya terhadap polusi mikroplastik.`;
-            
-            try {
-                const payload = {
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                    contents: [{ parts: [{ text: userQuery }] }],
-                };
-
-                const response = await fetch(GENERATE_TEXT_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API call failed with status: ${response.status}`);
-                }
-
-                const result = await response.json();
-                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                
-                if (text) {
-                     // Basic markdown to HTML conversion
-                    let htmlContent = text
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                        .replace(/(\r\n|\n|\r)/g, '<br>')
-                        .replace(/<br>\s*<br>/g, '<br><br>') // Handle double line breaks
-                        .replace(/<br>(\d+\.)/g, '<br><br>$1') // Add space before numbered lists
-                        .replace(/<br>(\-|\*)/g, '<br><br>$1'); // Add space before bullet points
-                        
-                    recommendationContent.innerHTML = htmlContent;
-                    recommendationOutput.classList.remove('hidden');
+            setTimeout(() => {
+                currentQuestionIndex++;
+                quizFeedback.textContent = "";
+                if (currentQuestionIndex < quizData.length) {
+                    displayQuestion();
                 } else {
-                    recommendationContent.textContent = 'Maaf, tidak dapat menghasilkan rekomendasi saat ini. Coba lagi nanti.';
+                    endQuiz();
                 }
-            } catch (error) {
-                console.error("Error generating recommendation:", error);
-                recommendationContent.textContent = 'Terjadi kesalahan saat menghubungi server. Mohon periksa koneksi Anda dan coba lagi.';
-                recommendationOutput.classList.remove('hidden');
-            } finally {
-                generateBtn.disabled = false;
-                recommendationLoader.classList.add('hidden');
-            }
+            }, 1500);
+        }
+
+        function endQuiz() {
+            quizArea.classList.add('hidden');
+            quizEndScreen.classList.remove('hidden');
+            finalQuizScoreEl.textContent = quizScore;
+        }
+
+        startQuizBtn.addEventListener('click', startQuiz);
+        restartQuizBtn.addEventListener('click', () => {
+            quizEndScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
         });
-
-
-        // --- Gemini Feature 2: News Summarization ---
-        const summarizeBtn = document.getElementById('summarize-news-btn');
-        const newsLoader = document.getElementById('news-loader');
-        const newsOutput = document.getElementById('news-output');
-        const newsContent = document.getElementById('news-content');
-        const newsSources = document.getElementById('news-sources');
-
-        summarizeBtn.addEventListener('click', async () => {
-            summarizeBtn.disabled = true;
-            newsLoader.classList.remove('hidden');
-            newsOutput.classList.add('hidden');
-
-            const userQuery = "Ringkas dalam satu paragraf singkat mengenai bahaya dan penemuan mikroplastik di Indonesia berdasarkan pengetahuan umum hingga saat ini.";
-
-            try {
-                 const payload = {
-                    contents: [{ parts: [{ text: userQuery }] }],
-                };
-
-                const response = await fetch(GENERATE_TEXT_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API call failed with status: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                const candidate = result.candidates?.[0];
-
-                if (candidate && candidate.content?.parts?.[0]?.text) {
-                    newsContent.innerHTML = candidate.content.parts[0].text.replace(/(\r\n|\n|\r)/g, '<br>');
-                    newsSources.innerHTML = ''; // Clear sources as we are not using grounding
-                    newsOutput.classList.remove('hidden');
-                } else {
-                    newsContent.textContent = 'Maaf, tidak dapat menghasilkan ringkasan berita saat ini. Coba lagi nanti.';
-                }
-
-            } catch(error) {
-                console.error("Error summarizing news:", error);
-                newsContent.textContent = 'Terjadi kesalahan saat menghubungi server. Mohon periksa koneksi Anda dan coba lagi.';
-                newsOutput.classList.remove('hidden');
-            } finally {
-                summarizeBtn.disabled = false;
-                newsLoader.classList.add('hidden');
-            }
-        });
-
+        
         // --- Chart and Initial Page Load ---
         document.addEventListener('DOMContentLoaded', () => {
-            const polymerCtx = document.getElementById('polymerChart').getContext('2d');
-            new Chart(polymerCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Polyethylene (PE)', 'Polypropylene (PP)', 'Polystyrene (PS)', 'PET', 'PVC', 'Lainnya'],
-                    datasets: [{
-                        label: 'Persentase Ditemukan (%)',
-                        data: [35, 28, 15, 12, 5, 5],
-                        backgroundColor: 'rgba(13, 148, 136, 0.8)', // Teal-600
-                        borderColor: 'rgba(13, 148, 136, 1)',
-                        borderWidth: 1,
-                        borderRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, title: { display: true, text: 'Persentase (%)' } } }
-                }
-            });
-
             const forecastingCtx = document.getElementById('forecastingChart').getContext('2d');
             new Chart(forecastingCtx, {
                 type: 'line',
                 data: {
-                    labels: ['2025', '2026', '2027', '2028', '2029', '2030'],
+                    labels: ['2024', '2025', '2026', '2027', '2028'],
                     datasets: [{
-                        label: 'Prediksi Konsentrasi (partikel/L)',
-                        data: [12.5, 13.1, 13.8, 14.5, 15.2, 16.0],
+                        label: 'Prediksi Timbulan Sampah Plastik (Juta Ton)',
+                        data: [9.2, 9.5, 9.8, 10.1, 10.5],
                         fill: true,
-                        backgroundColor: 'rgba(13, 148, 136, 0.1)', // Teal-600 transparent
-                        borderColor: 'rgba(13, 148, 136, 1)', // Teal-600
+                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                        borderColor: 'rgba(13, 148, 136, 1)',
                         tension: 0.3
                     }]
                 },
                 options: {
                      responsive: true,
+                     maintainAspectRatio: false,
                      scales: {
-                        y: {
-                             beginAtZero: false,
-                             title: { display: true, text: 'Konsentrasi (partikel/L)' },
-                             ticks: { callback: (value) => value.toString().replace('.', ',') }
-                        }
+                        y: { beginAtZero: false, title: { display: true, text: 'Jumlah (Juta Ton)' } }
                      }
                 }
             });
-            
-            showPage('dashboard');
+            showPage('tentang-simikro');
         });
     </script>
 </body>
