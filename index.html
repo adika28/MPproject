@@ -104,10 +104,12 @@
                             <p class="mb-4"><strong>Judul Infografis:</strong> Mikroplastik: Ancaman Tak Kasat Mata</p>
                             <p><strong>Tema:</strong> Integrasi Gaya Hidup dan Teknologi untuk Menuju Masyarakat Sehat.</p>
                              <p class="mt-4">Dashboard ini bertujuan meningkatkan kesadaran publik mengenai urgensi bahaya mikroplastik melalui visualisasi data yang komprehensif. Kami menyajikan hasil forecasting, peta persebaran, riset relevan, dampak kesehatan, hingga kuis interaktif untuk pemahaman yang menyeluruh.</p>
-                             <!-- TUTORIAL GAMBAR GITHUB:
-                                1. Unggah file gambar (infografis_final.jpg, logo_satriadata.png, peta_klaster.png) ke repository GitHub Anda, di folder yang sama dengan file HTML ini.
-                                2. Pastikan nama file di bawah ini (dalam atribut 'src') SAMA PERSIS dengan nama file yang Anda unggah.
-                                3. Setelah diunggah, tunggu 1-2 menit hingga GitHub Pages selesai memperbarui.
+                             <!-- 
+                                TUTORIAL UPLOAD GAMBAR KE GITHUB:
+                                1.  Di repository GitHub, klik "Add file" > "Upload files".
+                                2.  Seret file 'infografis_final.jpg', 'logo_satriadata.png', dan 'peta_klaster.png' ke area unggah. Pastikan file-file ini berada di folder yang sama dengan file HTML ini.
+                                3.  Pastikan nama file di atribut 'src' pada tag <img> di bawah SAMA PERSIS (termasuk huruf besar/kecil) dengan nama file yang diunggah.
+                                4.  Klik "Commit changes" dan tunggu 1-2 menit hingga website diperbarui.
                              -->
                         </div>
                         <div class="md:col-span-2 space-y-4">
@@ -160,7 +162,7 @@
                         <div class="w-full md:w-2/5">
                             <svg id="human-anatomy" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto max-w-xs mx-auto">
                                 <path fill="#e2e8f0" d="M100 10a20 20 0 110 40 20 20 0 010-40zm-20 50h40v20a40 40 0 01-40 0v-20zm-10 40h60l10 120h-80l10-120zm-5 130h70v80h-70v-80zm10 90h50v50h-50v-50z"/>
-                                <path class="organ-path-overlay" data-impact="saraf" d="M80 10a20 20 0 1140 0 20 20 0 01-40 0z" fill="transparent" cursor="pointer"/>
+                                <path class="organ-path-overlay" data-impact="saraf" d="M80 10 h40 v40 h-40 z" fill="transparent" cursor="pointer"/>
                                 <path class="organ-path-overlay" data-impact="pernapasan" d="M70 100h60v50h-60z" fill="transparent" cursor="pointer"/>
                                 <path class="organ-path-overlay" data-impact="kardiovaskular" d="M85 110h30v30h-30z" fill="transparent" cursor="pointer"/>
                                 <path class="organ-path-overlay" data-impact="metabolisme" d="M65 220h70v80h-70z" fill="transparent" cursor="pointer"/>
@@ -282,8 +284,7 @@
                 sidebar.classList.add('-translate-x-full');
             }
             
-            if(pageId === 'tentang-simikro') initTentang();
-            if(pageId === 'peta') initPeta();
+            if(pageId === 'tentang-simikro' || pageId === 'peta') initModal();
             if(pageId === 'forecasting') initForecastingChart();
             if(pageId === 'kesehatan') initHealthImpact();
             if(pageId === 'kuis') initQuiz();
@@ -314,9 +315,6 @@
         }
 
         // --- PAGE SPECIFIC INITIALIZATIONS ---
-        function initTentang() { initModal(); }
-        function initPeta() { initModal(); }
-
         function initForecastingChart() {
             const ctx = document.getElementById('forecastingChart')?.getContext('2d');
             if(!ctx) return;
